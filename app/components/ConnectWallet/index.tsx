@@ -1,92 +1,44 @@
 "use client";
+import React from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
-import { useState } from "react";
 
-export default function ConnectWallet() {
-  console.log(useConnect(), " 212122121");
+const ConnectWallet = () => {
+  // useAccount：获取当前钱包账户信息（地址、连接状态等）
   const { address, isConnected } = useAccount();
-  const { connect, connectors, status, error } = useConnect();
+  // useConnect：获取连接操作函数和可用连接器列表
+  const { connect, connectors } = useConnect();
+  // useDisconnect：获取断开连接的操作函数
   const { disconnect } = useDisconnect();
-  const [isConnecting, setIsConnecting] = useState(false);
 
-  const handleConnect = async () => {
-    try {
-      console.log("15钱包连接");
-      setIsConnecting(true);
-      const injectedConnector = connectors.find(
-        (connector) => connector.type === "injected",
-      );
-      if (injectedConnector) {
-        console.log("19injectedConnector", injectedConnector);
-        await connect({ connector: injectedConnector });
-      } else {
-        console.error("No injected connector found");
-      }
-    } catch (err) {
-      console.error("Connection failed:", err);
-    } finally {
-      setIsConnecting(false);
-    }
-  };
-
-  if (error) {
-    console.error("Connection error:", error);
-  }
-
-  if (!isConnected) {
+  // 已连接状态：显示地址 + 断开按钮
+  if (isConnected) {
     return (
-      <div className="flex flex-col items-end gap-2">
-        <button
-          onClick={handleConnect}
-          disabled={isConnecting || status === "pending"}
-          className="inline-flex items-center z-10 justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:bg-accent disabled:text-muted-foreground bg-blue-500/20 hover:bg-blue-500/15 text-blue-400 rounded-xl h-10 px-4 py-2"
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-orange-200 border border-orange-200 p-2 rounded-md">
+          {/* 地址太长，只显示前6位和后4位 */}
+          {address?.slice(0, 6)}...{address?.slice(-4)}
+        </span>
+        <span
+          className="text-sm text-red-400 cursor-pointer border border-red-400 p-2 rounded-md hover:bg-red-400 hover:text-black transition-colors"
+          onClick={() => disconnect()}
         >
-          {isConnecting || status === "pending" ? (
-            <>
-              <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2"></div>
-              连接中…
-            </>
-          ) : (
-            "Connect"
-          )}
-        </button>
-        {error && (
-          <div className="flex items-center gap-2 text-xs text-red-400 bg-red-500/10 px-3 py-2 rounded-lg border border-red-500/20">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            连接失败: {error.message}
-          </div>
-        )}
+          Disconnect
+        </span>
       </div>
     );
   }
 
+  // 未连接状态：点击后使用第一个可用连接器（injected，即浏览器插件钱包）连接
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 backdrop-blur-sm border border-green-500/30 rounded-xl">
-        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-        <span className="text-sm font-medium text-green-400">
-          已连接
-          {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "已连接"}
-        </span>
-      </div>
-      <button
-        onClick={() => disconnect()}
-        className="px-4 py-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 backdrop-blur-sm border border-red-500/30 text-red-400 font-medium rounded-xl hover:from-red-500/30 hover:to-pink-500/30 hover:text-red-300 transition-all duration-300 hover:scale-105"
+    <div className="flex">
+      <span
+        className="text-lt text-orange-200 cursor-pointer border border-orange-200 p-2 rounded-md hover:bg-orange-200 hover:text-black transition-colors"
+        onClick={() => connect({ connector: connectors[0] })}
       >
-        断开
-      </button>
+        Connect
+      </span>
     </div>
   );
-}
+};
+
+export default ConnectWallet;
