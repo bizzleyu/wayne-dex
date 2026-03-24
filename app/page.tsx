@@ -1,8 +1,5 @@
-import Header from "@/app/components/Header";
-
+import HomePage from "@/app/pages/home";
 
 export default function Home() {
-  return (
-      <Header />
-  );
+  return <HomePage />;
 }

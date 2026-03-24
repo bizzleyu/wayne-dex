@@ -1,15 +1,12 @@
 import React from "react";
-import ConnectWallet from "../ConnectWallet";
+import Logo from "@/app/components/Logo";
+import ConnectWallet from "@/app/components/ConnectWallet";
 
-const Header = () => {
+const Header: React.FC = () => {
   return (
-    <header className="flex justify-between py-6 px-6">
-      <div className="transition-all delay-150 duration-300 ease-in-out text-3xl hover:text-4xl cursor-pointer font-bold tracking-wider text-[#d946ef] drop-shadow-md ">
-        Wayne Dex
-      </div>
-      <div className="text-lt">
-        <ConnectWallet />
-      </div>
+    <header className="flex justify-between items-center py-4 w-full">
+      <Logo />
+      <ConnectWallet />
     </header>
   );
 };
